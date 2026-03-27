@@ -14,13 +14,13 @@ local SETTINGS = {
 	FOV_Radius = 150,
 	FOV_Color = Color3.fromRGB(255, 0, 0),
 	LockKey = Enum.KeyCode.E,
-	TriggerActive = true,
+	TriggerActive = false,
 	FireDelay = 0.2,
-	ESPEnabled = true,
-	ShowFOV = true
+	ESPEnabled = false,
+	ShowFOV = false
 }
 
-local lockOn = true
+local lockOn = false
 local lastShot = 0
 
 -- FOV Drawing
@@ -32,6 +32,38 @@ FOVCircle.Filled = false
 FOVCircle.Visible = SETTINGS.ShowFOV
 FOVCircle.Color = SETTINGS.FOV_Color
 FOVCircle.Transparency = 0.7
+
+local function setAimlockEnabled(state)
+	lockOn = state
+end
+
+local function setTriggerEnabled(state)
+	SETTINGS.TriggerActive = state
+end
+
+local function setFOVEnabled(state)
+	SETTINGS.ShowFOV = state
+	FOVCircle.Visible = state
+end
+
+local function setESPEnabled(state)
+	SETTINGS.ESPEnabled = state
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p ~= player and p.Character then
+			local highlight = p.Character:FindFirstChild("CoreESP")
+			if highlight then
+				highlight.Enabled = state
+			end
+		end
+	end
+end
+
+local function disableAllFeatures()
+	setAimlockEnabled(false)
+	setTriggerEnabled(false)
+	setFOVEnabled(false)
+	setESPEnabled(false)
+end
 
 -- Target Acquisition
 local function getPrediction(part)
@@ -512,9 +544,27 @@ do
     local UI = Library:Init()
 
     local Main = UI:AddTab("Home")
-    Main:AddSection("Main Features") 
-    Main:AddButton("Execute Script", function() end)
-    Main:AddToggle("Auto-Farm", Enum.KeyCode.F, function(v) end)
+    Main:AddSection("Combat")
+    Main:AddToggle("Aimlock", nil, function(v)
+    	setAimlockEnabled(v)
+    end)
+    Main:AddToggle("Triggerbot", nil, function(v)
+    	setTriggerEnabled(v)
+    end)
 
-    Library:Notify("Nexo Hub", "Interface loaded successfully")
+    Main:AddSection("Visuals")
+    Main:AddToggle("ESP", nil, function(v)
+    	setESPEnabled(v)
+    end)
+    Main:AddToggle("Show FOV", nil, function(v)
+    	setFOVEnabled(v)
+    end)
+
+    Main:AddSection("Safety")
+    Main:AddButton("Turn Everything Off", function()
+    	disableAllFeatures()
+    	Library:Notify("Nexo Hub", "All features are now OFF")
+    end)
+
+    Library:Notify("Nexo Hub", "Template GUI is now fully linked")
 end
