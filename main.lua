@@ -169,7 +169,7 @@ Players.PlayerAdded:Connect(applyESP)
 for _, p in ipairs(Players:GetPlayers()) do applyESP(p) end
 
 -- Integrated from wind.lua (inlined single-file)
-local a a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()return{
+local a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()return{
 
 Primary=Color3.fromHex"#0091FF",
 
