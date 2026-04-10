@@ -22,6 +22,10 @@ local SETTINGS = {
 	Prediction = 0.135,
 	FOV_Radius = 150,
 	LockKey = Enum.KeyCode.E,
+	UIToggleKey = Enum.KeyCode.B,
+	TriggerKey = Enum.KeyCode.T,
+	ESPKey = Enum.KeyCode.H,
+	FOVKey = Enum.KeyCode.V,
 	FOV_Color = Color3.fromRGB(255, 0, 0),
 	WalkSpeed = defaultWS,
 	JumpPower = defaultJP 
@@ -314,16 +318,20 @@ addSlider(aimCard, "Prediction", 0.001, 0.5, 0.135, 0.001, function(v) SETTINGS.
 addSlider(aimCard, "FOV Radius", 50, 800, 150, 1, function(v) SETTINGS.FOV_Radius = v; FOVCircle.Radius = v end)
 
 local triggerCard = makeCard(pageAim, "TriggerBot", "Auto engagement")
-addToggle(triggerCard, "Enable TriggerBot", false, function(v) triggerActive = v end)
+local triggerToggle = addToggle(triggerCard, "Enable TriggerBot", false, function(v) triggerActive = v end)
 addTextbox(triggerCard, "Fire Delay", "0.2", function(t) fireDelay = tonumber(t) or 0.2 end)
+addKeybind(triggerCard, "TriggerBot Keybind", SETTINGS.TriggerKey, function(k) SETTINGS.TriggerKey = k end)
 
 local visualCard = makeCard(pageVisuals, "Player Visuals", "Tracking systems")
-addToggle(visualCard, "Player ESP Highlights", false, function(v) espEnabled = v end)
-addToggle(visualCard, "Show FOV Circle", false, function(v) showFOV = v; FOVCircle.Visible = v end)
+local espToggle = addToggle(visualCard, "Player ESP Highlights", false, function(v) espEnabled = v end)
+local fovToggle = addToggle(visualCard, "Show FOV Circle", false, function(v) showFOV = v; FOVCircle.Visible = v end)
+addKeybind(visualCard, "ESP Keybind", SETTINGS.ESPKey, function(k) SETTINGS.ESPKey = k end)
+addKeybind(visualCard, "FOV Keybind", SETTINGS.FOVKey, function(k) SETTINGS.FOVKey = k end)
 
 local universalCard = makeCard(pageUniversal, "Universal Character", "Character modifications")
 addSlider(universalCard, "WalkSpeed Boost", defaultWS, 150, defaultWS, 1, function(v) SETTINGS.WalkSpeed = v end)
 addSlider(universalCard, "JumpPower Boost", defaultJP, 300, defaultJP, 1, function(v) SETTINGS.JumpPower = v end)
+addKeybind(universalCard, "UI Toggle Keybind", SETTINGS.UIToggleKey, function(k) SETTINGS.UIToggleKey = k end)
 
 -- Core Engine
 RunService.RenderStepped:Connect(function()
@@ -365,7 +373,20 @@ UIS.InputBegan:Connect(function(input, gpe)
 		lockOn = not lockOn
 		aimlockToggle.Set(lockOn)
 	end
-	if input.KeyCode == Enum.KeyCode.B then
+	if input.KeyCode == SETTINGS.TriggerKey then
+		triggerActive = not triggerActive
+		triggerToggle.Set(triggerActive)
+	end
+	if input.KeyCode == SETTINGS.ESPKey then
+		espEnabled = not espEnabled
+		espToggle.Set(espEnabled)
+	end
+	if input.KeyCode == SETTINGS.FOVKey then
+		showFOV = not showFOV
+		FOVCircle.Visible = showFOV
+		fovToggle.Set(showFOV)
+	end
+	if input.KeyCode == SETTINGS.UIToggleKey then
 		root.Visible = not root.Visible
 		tween(blur, TweenInfo.new(0.2), {Size = root.Visible and 14 or 0})
 	end
